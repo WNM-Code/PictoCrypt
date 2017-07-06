@@ -1,0 +1,23 @@
+﻿<Window x:Class="PictoCrypt.MainWindow"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+        xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+        xmlns:local="clr-namespace:PictoCrypt"
+        mc:Ignorable="d"
+        Title="PictoCrypt" Height="540" Width="960">
+    <Grid MouseLeftButtonDown="grid1_MouseDown" MouseDown="grid1_MouseDown" Name="grid1" Focusable="True">
+        <Rectangle Fill="#FFF4F4F5" Stroke="Black" Grid.ColumnSpan="1" StrokeThickness="3"/>
+        <Rectangle Fill="#FFF4F4F5" HorizontalAlignment="Left" Stroke="Black" StrokeThickness="3" Width="223"/>
+
+        <Button x:Name="SelectPhoto" Content="Select Photo" HorizontalAlignment="Left" Margin="24,45,0,0" Click="SelectPhoto_Click" VerticalAlignment="Top" Width="75"/>
+
+        <Viewbox Stretch="Uniform" Margin="223,7,10,7">
+            <Image x:Name="Image" HorizontalAlignment="Right" VerticalAlignment="Center"/>
+        </Viewbox>
+
+
+        <TextBox x:Name="Key" HorizontalAlignment="Left" Height="23" Margin="24,96,0,0" TextWrapping="Wrap" GotFocus="Key_GotFocus" LostFocus="Key_LostFocus" VerticalAlignment="Top" Width="142" Text="Enter an encryption key" TextChanged="Key_TextChanged"/>
+
+    </Grid>
+</Window>
