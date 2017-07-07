@@ -25,6 +25,9 @@ namespace PictoCrypt
         String Keyphrase = "";
         Crypter c;
         Bitmap i;
+        String location;
+        String filename;
+        String filetype;
         public MainWindow()
         {
             InitializeComponent();
@@ -38,15 +41,28 @@ namespace PictoCrypt
             CommonFileDialogResult result = dialog.ShowDialog();
             try
             {
-                ((Button)sender).Content = dialog.FileName;
-                //i = new BitmapImage(new Uri(@"" + dialog.FileName));
-                i = new Bitmap(dialog.FileName);
-                Image.Source = new BitmapImage(new Uri(@"" + dialog.FileName));
-                c.Encrypt(i, dialog.FileName + "encrypted");
+                var tempfile = dialog.FileName;
+                ((Button)sender).Content = tempfile;
+                i = new Bitmap(tempfile);
+                Image.Source = new BitmapImage(new Uri(@"" + tempfile));
+                location = "";
+                filename = "";
+                filetype = "";
+                int lasts = tempfile.LastIndexOf('\\');
+                location = tempfile.Substring(0, lasts +1);
+                int lastp = tempfile.LastIndexOf('.');
+                int lastp2 = lastp - (lasts + 1);
+                filename = tempfile.Substring(lasts + 1, lastp2);
+                filetype = tempfile.Substring(lastp);
+
+                Console.WriteLine(location);
+                Console.WriteLine(filename);
+                Console.WriteLine(filetype);
             }
             catch
             {
                 ((Button)sender).Content = "Select Photo";
+                Image.Visibility = Visibility.Hidden;
             }
         }
 
@@ -70,6 +86,7 @@ namespace PictoCrypt
             }
             else
             {
+                c.setKey(text);
                 Keyphrase = text;
             }
         }
@@ -77,6 +94,16 @@ namespace PictoCrypt
         private void Key_TextChanged(object sender, TextChangedEventArgs e)
         {
 
+        }
+
+        private void Encrypt_Click(object sender, RoutedEventArgs e)
+        {
+            c.encrypt(i, location, filename, filetype);
+        }
+
+        private void Decrypt_Click(object sender, RoutedEventArgs e)
+        {
+            c.decrypt(i, location, filename, filetype);
         }
     }
 }

@@ -10,14 +10,16 @@
         <Rectangle Fill="#FFF4F4F5" Stroke="Black" Grid.ColumnSpan="1" StrokeThickness="3"/>
         <Rectangle Fill="#FFF4F4F5" HorizontalAlignment="Left" Stroke="Black" StrokeThickness="3" Width="223"/>
 
-        <Button x:Name="SelectPhoto" Content="Select Photo" HorizontalAlignment="Left" Margin="24,45,0,0" Click="SelectPhoto_Click" VerticalAlignment="Top" Width="75"/>
+        <Button x:Name="SelectPhoto" Content="Select Photo" HorizontalAlignment="Left" Margin="10,45,0,0" Click="SelectPhoto_Click" VerticalAlignment="Top" Width="202"/>
 
-        <Viewbox Stretch="Uniform" Margin="223,7,10,7">
+        <Viewbox Stretch="Uniform" Margin="227,7,7,7">
             <Image x:Name="Image" HorizontalAlignment="Right" VerticalAlignment="Center"/>
         </Viewbox>
 
 
-        <TextBox x:Name="Key" HorizontalAlignment="Left" Height="23" Margin="24,96,0,0" TextWrapping="Wrap" GotFocus="Key_GotFocus" LostFocus="Key_LostFocus" VerticalAlignment="Top" Width="142" Text="Enter an encryption key" TextChanged="Key_TextChanged"/>
+        <TextBox x:Name="Key" HorizontalAlignment="Left" Height="23" Margin="43,96,0,0" TextWrapping="Wrap" GotFocus="Key_GotFocus" LostFocus="Key_LostFocus" VerticalAlignment="Top" Width="142" Text="Enter an encryption key" TextChanged="Key_TextChanged"/>
+        <Button x:Name="Encrypt" Content="Encrypt" HorizontalAlignment="Left" Margin="10,150,0,0" VerticalAlignment="Top" Width="75" Click="Encrypt_Click"/>
+        <Button x:Name="Decrypt" Content="Decrypt" HorizontalAlignment="Left" Margin="137,150,0,0" VerticalAlignment="Top" Width="75" Click="Decrypt_Click"/>
 
     </Grid>
 </Window>

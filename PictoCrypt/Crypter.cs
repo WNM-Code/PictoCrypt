@@ -11,10 +11,12 @@ namespace PictoCrypt
     class Crypter
     {
         private String key;
+        private List<int> convKey;
 
         public Crypter(String key)
         {
             this.key = key;
+            convKey = new List<int>();
         }
 
         public string getKey()
@@ -25,18 +27,28 @@ namespace PictoCrypt
         public void setKey(String key)
         {
             this.key = key;
+            convKey.Clear();
+            char[] splitKey = key.ToCharArray();
+            for (int i = 0; i < key.Length; i++)
+            {
+                convKey.Add(splitKey[i]);
+            }
+
+            foreach(int a in convKey)
+            {
+                Console.WriteLine(a);
+            }
         }
 
-        public Bitmap Encrypt(Bitmap i, String saveLocation)
+        public Bitmap encrypt(Bitmap i, String saveLocation, String name, String type)
         {
-            //for (int j = 0; j < 100; j++)
-            //{
-            //    for (int k = 0; k < 100; k++)
-            //    {
-            //        i.SetPixel(j, k, Color.FromArgb(255, 19, 15, 255));
-            //    }
-            //}
-            i.Save(@"" + saveLocation + ".png");
+            i.Save(@"" + saveLocation + name + "-encrypted" + type);
+            return null;
+        }
+
+        public Bitmap decrypt(Bitmap i, String saveLocation, String name, String type)
+        {
+            i.Save(@"" + saveLocation + name + "-decrypted" + type);
             return null;
         }
     }
