@@ -83,6 +83,7 @@ namespace PictoCrypt
             {
                 ((TextBox)sender).Text = "Enter an encryption key";
                 Keyphrase = "";
+                c.setKey("");
             }
             else
             {
