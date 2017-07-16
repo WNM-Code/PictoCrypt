@@ -43,6 +43,7 @@ namespace PictoCrypt
             Bitmap b;
             b = pushV(i, bounds[0], bounds[1]);
             b = pushH(b, bounds[0], bounds[1]);
+            //b = push(i, bounds[0], bounds[1]);
             b.Save(@"" + saveLocation + name + "-encrypted" + type);
             return null;
         }
@@ -53,10 +54,36 @@ namespace PictoCrypt
             Bitmap b;
             b = unPushH(i, bounds[0], bounds[1]);
             b = unPushV(b, bounds[0], bounds[1]);
+            //b= unPush(i, bounds[0], bounds[1]);
             b.Save(@"" + saveLocation + name + "-decrypted" + type);
             return null;
         }
+        private Bitmap push(Bitmap a, int wid, int hei)
+        {
+            Bitmap b = new Bitmap(a);
+            //ToDo: Resolve overwrite issue
+            for (int wloc = 0; wloc < wid; wloc++)
+            {
+                for (int hloc = 0; hloc < hei; hloc++)
+                {
+                    b.SetPixel((wloc + convKey[hloc % keyLen]) % wid, (hloc + convKey[wloc % keyLen]) % hei, a.GetPixel(wloc, hloc));
+                }
+            }
+            return b;
+        }
 
+        private Bitmap unPush(Bitmap a, int wid, int hei)
+        {
+            Bitmap b = new Bitmap(a);
+            for (int wloc = 0; wloc < wid; wloc++)
+            {
+                for (int hloc = 0; hloc < hei; hloc++)
+                {
+                    b.SetPixel(wloc, hloc, a.GetPixel((wloc + convKey[hloc % keyLen]) % wid, (hloc + convKey[wloc % keyLen]) % hei));
+                }
+            }
+            return b;
+        }
         private Bitmap pushV(Bitmap a, int wid, int hei)
         {
             Bitmap b = new Bitmap(a);
@@ -64,7 +91,7 @@ namespace PictoCrypt
             {
                 for(int hloc = 0; hloc < hei; hloc++)
                 {
-                    b.SetPixel(wloc, (hloc + convKey[wloc % keyLen]) % hei, a.GetPixel(wloc,hloc));
+                    b.SetPixel(wloc, (hloc + (convKey[wloc % keyLen] * 40)) % hei, a.GetPixel(wloc,hloc));
                 }
             }
             return b;
@@ -77,7 +104,7 @@ namespace PictoCrypt
             {
                 for (int hloc = 0; hloc < hei; hloc++)
                 {
-                    b.SetPixel(wloc, ((hloc - convKey[wloc % keyLen])+hei) % hei, a.GetPixel(wloc, hloc));
+                    b.SetPixel(wloc, ((hloc - (convKey[wloc % keyLen]*40))+(hei*40)) % hei, a.GetPixel(wloc, hloc));
                 }
             }
             return b;
@@ -89,7 +116,7 @@ namespace PictoCrypt
             {
                 for (int wloc = 0; wloc < wid; wloc++)
                 {
-                    b.SetPixel((wloc + convKey[hloc%keyLen])%wid, hloc, a.GetPixel(wloc, hloc));
+                    b.SetPixel((wloc + (convKey[hloc%keyLen]*40))%wid, hloc, a.GetPixel(wloc, hloc));
                 }
             }
             return b;
@@ -102,11 +129,14 @@ namespace PictoCrypt
             {
                 for (int hloc = 0; hloc < hei; hloc++)
                 {
-                    b.SetPixel(((wloc - convKey[hloc % keyLen])+wid) % wid, hloc, a.GetPixel(wloc, hloc));
+                    b.SetPixel(((wloc - (convKey[hloc % keyLen]*40))+(wid*40)) % wid, hloc, a.GetPixel(wloc, hloc));
                 }
             }
             return b;
         }
+
+        
+
         private Bitmap shuffle(Bitmap a, int wid, int hei)
         {
             Bitmap b = new Bitmap(a);
