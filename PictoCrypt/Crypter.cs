@@ -41,6 +41,7 @@ namespace PictoCrypt
         {
             int[] bounds = getBounds(i);
             Bitmap b;
+
             b = pushV(i, bounds[0], bounds[1]);
             b = pushH(b, bounds[0], bounds[1]);
             //b = push(i, bounds[0], bounds[1]);
@@ -52,12 +53,14 @@ namespace PictoCrypt
         {
             int[] bounds = getBounds(i);
             Bitmap b;
+
             b = unPushH(i, bounds[0], bounds[1]);
             b = unPushV(b, bounds[0], bounds[1]);
             //b= unPush(i, bounds[0], bounds[1]);
             b.Save(@"" + saveLocation + name + "-decrypted" + type);
             return null;
         }
+
         private Bitmap push(Bitmap a, int wid, int hei)
         {
             Bitmap b = new Bitmap(a);
@@ -71,7 +74,6 @@ namespace PictoCrypt
             }
             return b;
         }
-
         private Bitmap unPush(Bitmap a, int wid, int hei)
         {
             Bitmap b = new Bitmap(a);
@@ -134,15 +136,11 @@ namespace PictoCrypt
             }
             return b;
         }
-
-        
-
         private Bitmap shuffle(Bitmap a, int wid, int hei)
         {
             Bitmap b = new Bitmap(a);
             return b;
         }
-
         private Bitmap flip(Bitmap a, int wid, int hei)
         {
             Bitmap b = new Bitmap(a);

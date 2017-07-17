@@ -1,0 +1,179 @@
+﻿//Author: Will McCall
+//Purpose: Record of an attempted method for this project
+///////////////////////////////////////////////////////////////////////////////
+I found this idea for a key based permutation of the pixels from this PDF: 
+https://pdfs.semanticscholar.org/3372/5b376865f37d2fc9f71e8c2e0bfbbdaf4a6f.pdf
+
+If the webaddress nolonger exists it is the following:
+
+Hussain, Shakir M., and Naim M. Ajlouni. "Key Based Random Permutation (KBRP)."
+Journal of Computer Science 2.5 (2006): 419-21. Web. 16 July 2017.
+
+I took this idea and psuedocode and implemented it to work with a 2D array, 
+whereas this is used for a single array. I found that my translation of the
+pseudo code to real C# code had some bugs, but more importantly, it was 
+unbearably slow. This algorithm would work just fine and be exactly the outcome 
+I wanted had this been for a project that does not deal with many cells. 
+I didn't attempt to debug this code since I determined it was too slow to use,
+thus resolving any bugs would have not helped this project. I am retiring this
+method from my code as it does not perform well enough, but leaving it here as
+a record of what has been done.
+
+//Creates the mapping, utilizing the methods below
+private int[] randomize(int[] bounds)
+{
+	int[] flat = init(bounds);
+	flat = remove(flat);
+	return fill(flat);
+}
+
+//Fills the mapping with numbers based on a key that you put into it
+//this key was held in the containing class and is referenced as "key"
+private int[] init(int[] bounds)
+{
+	int longSize = bounds[0] * bounds[1];
+	int[] flat = new int[longSize];
+	int i = 0;
+	while (i < key.Length-1 && i < longSize-1)
+	{
+		flat[i] = key[i];
+		i++;
+	}
+	i = 0;
+	int tmp = flat[1];
+	while (i < key.Length - 2 && i < longSize)
+	{
+		flat[i] = flat[i] + flat[i + 1];
+		i++;
+	}
+	flat[i] = tmp;
+	int j = key.Length + 1;
+	while (key.Length < longSize)
+	{
+		for (i = 0; i < key.Length - 1; i++)
+		{
+			for (int k = i; k < key.Length - 1 && j < longSize; k++)
+			{
+				flat[i] = flat[i] + flat[k + 1];
+				j++;
+			}
+		}
+		if (j == longSize)
+		{
+			break;
+		}
+	}
+	for (i = 0; i < longSize; i++)
+	{
+		flat[i] = flat[i] % longSize;
+	}
+	return flat;
+}
+
+//Replaces all duplicates from the mapping with -1
+private int[] remove(int[] flat)
+{
+	int l = 0;
+	int r = flat.Length - 1;
+	while (l < r)
+	{
+		for (int i = l+1; i < r; i++)
+		{
+			if (flat[l] == flat[i])
+			{
+				flat[i] = -1;
+			}
+		}
+		for(int i = r-1; i > l; i--)
+		{
+			if (flat[r] == flat[i])
+			{
+				flat[i] = -1;
+			}
+		}
+		l++;
+		r--;
+	}
+	return flat;
+}
+
+//Fills the mapping with the missing numbers
+//Finds the numbers that were missing
+private int[] fill(int[] flat)
+{
+	List<int> tempflat = new List<int>(flat);
+	List<int> tempmissing = new List<int>();
+	int m = 0;
+	for(int i = 0; i < flat.Length; i++)
+	{
+		if (!tempflat.Contains(i))
+		{
+			tempmissing.Add(i);
+			m++;
+		}
+	}
+	int[] missing = tempmissing.ToArray();
+	int j;
+	int k;
+	for(int i = 0; i < m;)
+	{
+		j = flat.Length - 1;
+		while(flat[i] != -1 && j > 0)
+		{
+			j--;
+		}
+		if (j > 0)
+		{
+			flat[j] = missing[i];
+			i++;
+		}
+		k = 1;
+		while (flat[k]!=-1 && k < flat.Length - 1)
+		{
+			k++;
+		}
+		if (k <= flat.Length - 1)
+		{
+			flat[k] = missing[i];
+			i++;
+		}
+	}
+	return flat;
+}
+
+//Method that encrypts the photo with the created mapping
+private Bitmap randomEn(Bitmap i, int wid, int hei, int[] key)
+{
+	Console.WriteLine("1");
+	Bitmap b = new Bitmap(i);
+	int k = 0;
+	for (int wloc = 0; wloc < wid; wloc++)
+	{
+		for (int hloc = 0; hloc < hei; hloc++)
+		{
+			int x = key[k] % wid;
+			int y = key[k] / wid;
+			b.SetPixel(x, y, i.GetPixel(wloc, hloc));   
+			k++;
+		}
+	}
+	return b;
+}
+
+//Method that decrypts the photo with the created mapping
+private Bitmap randomDe(Bitmap i, int wid, int hei, int[] key)
+{
+	Bitmap b = new Bitmap(i);
+	int k = 0;
+	for (int wloc = 0; wloc < wid; wloc++)
+	{
+		for (int hloc = 0; hloc < hei; hloc++)
+		{
+			int x = key[k] % wid;
+			int y = key[k] / wid;
+			b.SetPixel(wloc, hloc, i.GetPixel(x, y));
+			k++;
+		}
+	}
+	return b;
+}
