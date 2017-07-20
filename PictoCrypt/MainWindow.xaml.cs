@@ -24,14 +24,14 @@ namespace PictoCrypt
     {
         String Keyphrase = "";
         Crypter c;
-        Bitmap i;
-        String location;
-        String filename;
-        String filetype;
+        //public Bitmap i;
+        //public String location;
+        //public String filename;
+        //public String filetype;
         public MainWindow()
         {
             InitializeComponent();
-             c = new Crypter(Keyphrase);
+            c = new Crypter(Keyphrase);
         }
 
         private void SelectPhoto_Click(object sender, RoutedEventArgs e)
@@ -43,25 +43,15 @@ namespace PictoCrypt
             {
                 var tempfile = dialog.FileName;
                 ((Button)sender).Content = tempfile;
-                i = new Bitmap(tempfile);
+                c.setImage(new Bitmap(tempfile));
                 Image.Source = new BitmapImage(new Uri(@"" + tempfile));
-                location = "";
-                filename = "";
-                filetype = "";
-                int lasts = tempfile.LastIndexOf('\\');
-                location = tempfile.Substring(0, lasts +1);
-                int lastp = tempfile.LastIndexOf('.');
-                int lastp2 = lastp - (lasts + 1);
-                filename = tempfile.Substring(lasts + 1, lastp2);
-                filetype = tempfile.Substring(lastp);
-
-                Console.WriteLine(location);
-                Console.WriteLine(filename);
-                Console.WriteLine(filetype);
+                c.setLocation(tempfile, null);
             }
             catch
             {
                 ((Button)sender).Content = "Select Photo";
+                c.setLocation("", null);
+                c.setImage(null);
                 Image.Visibility = Visibility.Hidden;
             }
         }
@@ -99,12 +89,12 @@ namespace PictoCrypt
 
         private void Encrypt_Click(object sender, RoutedEventArgs e)
         {
-            c.encrypt(i, location, filename, filetype);
+            c.encrypt(Image, SelectPhoto);
         }
 
         private void Decrypt_Click(object sender, RoutedEventArgs e)
         {
-            c.decrypt(i, location, filename, filetype);
+            c.decrypt(Image, SelectPhoto);
         }
     }
 }

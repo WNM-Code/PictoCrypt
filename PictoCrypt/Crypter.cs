@@ -1,9 +1,12 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Drawing;
+using System.IO;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using System.Windows.Controls;
+using System.Windows.Media;
 using System.Windows.Media.Imaging;
 
 namespace PictoCrypt
@@ -13,11 +16,17 @@ namespace PictoCrypt
         private String key;
         private List<int> convKey;
         private int keyLen;
+        private Bitmap i;
+        private String location;
+        private String filename;
+        private String filetype;
+        ImageSourceConverter c;
 
         public Crypter(String key)
         {
             this.key = key;
             convKey = new List<int>();
+            c = new ImageSourceConverter();
         }
 
         public string getKey()
@@ -37,32 +46,47 @@ namespace PictoCrypt
             }
         }
 
-        public Bitmap encrypt(Bitmap i, String saveLocation, String name, String type)
-        {
-            int[] bounds = getBounds(i);
-            Bitmap b;
-            int[] randx = randomize(bounds[0]);
-            int[] randy = randomize(bounds[1]);
-            b = randomEnW(i, bounds[0], bounds[1], randx);
-            b = randomEnH(b, bounds[0], bounds[1], randy);
-            b = pushV(b, bounds[0], bounds[1]);
-            b = pushH(b, bounds[0], bounds[1]);
-            b.Save(@"" + saveLocation + name + "-encrypted" + type);
-            return null;
+        public async void encrypt(System.Windows.Controls.Image view, Button bu)
+        {   if(i != null && key != "")
+            {
+                await Task.Run(() =>
+                {
+                    int[] bounds = getBounds(i);
+                    Bitmap b;
+                    int[] randx = randomize(bounds[0]);
+                    int[] randy = randomize(bounds[1]);
+                    b = randomEnW(i, bounds[0], bounds[1], randx, view);
+                    b = randomEnH(b, bounds[0], bounds[1], randy, view);
+                    b = pushV(b, bounds[0], bounds[1], view);
+                    b = pushH(b, bounds[0], bounds[1], view);
+                    String loc = location + filename + "-encrypted" + filetype;
+                    b.Save(@"" + loc);
+                    setLocation(loc, bu);
+                    setImage(b);
+                });
+            }
         }
 
-        public Bitmap decrypt(Bitmap i, String saveLocation, String name, String type)
+        public async void decrypt(System.Windows.Controls.Image view, Button bu)
         {
-            int[] bounds = getBounds(i);
-            Bitmap b;
-            int[] randx = randomize(bounds[0]);
-            int[] randy = randomize(bounds[1]);
-            b = unPushH(i, bounds[0], bounds[1]);
-            b = unPushV(b, bounds[0], bounds[1]);
-            b = randomDeH(b, bounds[0], bounds[1], randy);
-            b = randomDeW(b, bounds[0], bounds[1], randx);
-            b.Save(@"" + saveLocation + name + "-decrypted" + type);
-            return null;
+            if (i != null && key != "")
+            {
+                await Task.Run(() =>
+                {
+                    int[] bounds = getBounds(i);
+                    Bitmap b;
+                    int[] randx = randomize(bounds[0]);
+                    int[] randy = randomize(bounds[1]);
+                    b = unPushH(i, bounds[0], bounds[1], view);
+                    b = unPushV(b, bounds[0], bounds[1], view);
+                    b = randomDeH(b, bounds[0], bounds[1], randy, view);
+                    b = randomDeW(b, bounds[0], bounds[1], randx, view);
+                    String loc = location + filename + "-decrypted" + filetype;
+                    b.Save(@"" + loc);
+                    setLocation(loc, bu);
+                    setImage(b);
+                });
+            }
         }
 
         private Bitmap push(Bitmap a, int wid, int hei)
@@ -90,7 +114,7 @@ namespace PictoCrypt
             }
             return b;
         }
-        private Bitmap pushV(Bitmap a, int wid, int hei)
+        private Bitmap pushV(Bitmap a, int wid, int hei, System.Windows.Controls.Image view)
         {
             Bitmap b = new Bitmap(a);
             for (int wloc = 0; wloc < wid; wloc++)
@@ -99,10 +123,11 @@ namespace PictoCrypt
                 {
                     b.SetPixel(wloc, (hloc + (convKey[wloc % keyLen] * 40)) % hei, a.GetPixel(wloc,hloc));
                 }
+                updateImage(b, view);
             }
             return b;
         }
-        private Bitmap unPushV(Bitmap a, int wid, int hei)
+        private Bitmap unPushV(Bitmap a, int wid, int hei, System.Windows.Controls.Image view)
         {
             Bitmap b = new Bitmap(a);
             //fix negative problem better
@@ -112,10 +137,11 @@ namespace PictoCrypt
                 {
                     b.SetPixel(wloc, ((hloc - (convKey[wloc % keyLen]*40))+(hei*40)) % hei, a.GetPixel(wloc, hloc));
                 }
+                updateImage(b, view);
             }
             return b;
         }
-        private Bitmap pushH(Bitmap a, int wid, int hei)
+        private Bitmap pushH(Bitmap a, int wid, int hei, System.Windows.Controls.Image view)
         {
             Bitmap b = new Bitmap(a);
             for (int hloc = 0; hloc < hei; hloc++)
@@ -124,10 +150,11 @@ namespace PictoCrypt
                 {
                     b.SetPixel((wloc + (convKey[hloc%keyLen]*40))%wid, hloc, a.GetPixel(wloc, hloc));
                 }
+                updateImage(b, view);
             }
             return b;
         }
-        private Bitmap unPushH(Bitmap a, int wid, int hei)
+        private Bitmap unPushH(Bitmap a, int wid, int hei, System.Windows.Controls.Image view)
         {
             Bitmap b = new Bitmap(a);
             //fix negative problem better
@@ -137,17 +164,8 @@ namespace PictoCrypt
                 {
                     b.SetPixel(((wloc - (convKey[hloc % keyLen]*40))+(wid*40)) % wid, hloc, a.GetPixel(wloc, hloc));
                 }
+                updateImage(b, view);
             }
-            return b;
-        }
-        private Bitmap shuffle(Bitmap a, int wid, int hei)
-        {
-            Bitmap b = new Bitmap(a);
-            return b;
-        }
-        private Bitmap flip(Bitmap a, int wid, int hei)
-        {
-            Bitmap b = new Bitmap(a);
             return b;
         }
         
@@ -268,7 +286,7 @@ namespace PictoCrypt
         }
 
         //Method that encrypts the photo with the created mapping
-        private Bitmap randomEnH(Bitmap i, int wid, int hei, int[] key)
+        private Bitmap randomEnH(Bitmap i, int wid, int hei, int[] key, System.Windows.Controls.Image view)
         {
             Bitmap b = new Bitmap(i);
             for (int wloc = 0; wloc < wid; wloc++)
@@ -277,12 +295,13 @@ namespace PictoCrypt
                 {
                     b.SetPixel(wloc, key[hloc], i.GetPixel(wloc, hloc));
                 }
+                updateImage(b, view);
             }
             return b;
         }
 
         //Method that encrypts the photo with the created mapping
-        private Bitmap randomEnW(Bitmap i, int wid, int hei, int[] key)
+        private Bitmap randomEnW(Bitmap i, int wid, int hei, int[] key, System.Windows.Controls.Image view)
         {
             Bitmap b = new Bitmap(i);
             for (int hloc = 0; hloc < hei; hloc++) 
@@ -291,12 +310,13 @@ namespace PictoCrypt
                 {
                     b.SetPixel(key[wloc], hloc, i.GetPixel(wloc, hloc));
                 }
+                updateImage(b, view);
             }
             return b;
         }
 
         //Method that decrypts the photo with the created mapping
-        private Bitmap randomDeH(Bitmap i, int wid, int hei, int[] key)
+        private Bitmap randomDeH(Bitmap i, int wid, int hei, int[] key, System.Windows.Controls.Image view)
         {
             Bitmap b = new Bitmap(i);
             for (int hloc = 0; hloc < hei; hloc++)
@@ -305,12 +325,13 @@ namespace PictoCrypt
                 {
                     b.SetPixel(wloc, hloc, i.GetPixel(wloc, key[hloc]));
                 }
+                updateImage(b, view);
             }
             return b;
         }
 
         //Method that decrypts the photo with the created mapping
-        private Bitmap randomDeW(Bitmap i, int wid, int hei, int[] key)
+        private Bitmap randomDeW(Bitmap i, int wid, int hei, int[] key, System.Windows.Controls.Image view)
         {
             Bitmap b = new Bitmap(i);
             for (int hloc = 0; hloc < hei; hloc++)
@@ -319,8 +340,64 @@ namespace PictoCrypt
                 {
                     b.SetPixel(wloc, hloc, i.GetPixel(key[wloc], hloc));
                 }
+                updateImage(b, view);
             }
             return b;
+        }
+
+        //Convert Bitmap to ImageSource
+        //Credit to: Farhan Anam in www.stackoverflow.com/a/34361396
+        BitmapImage BitmapToImageSource(Bitmap bitmap)
+        {
+            using (MemoryStream memory = new MemoryStream())
+            {
+                bitmap.Save(memory, System.Drawing.Imaging.ImageFormat.Bmp);
+                memory.Position = 0;
+                BitmapImage bitmapimage = new BitmapImage();
+                bitmapimage.BeginInit();
+                bitmapimage.StreamSource = memory;
+                bitmapimage.CacheOption = BitmapCacheOption.OnLoad;
+                bitmapimage.EndInit();
+
+                return bitmapimage;
+            }
+        }
+
+        public void updateImage(Bitmap b, System.Windows.Controls.Image view)
+        {
+            view.Dispatcher.Invoke(() =>
+            {
+                view.Source = BitmapToImageSource(b);
+            });
+        }
+
+        public void setLocation(String l, Button b)
+        {
+            location = "";
+            filename = "";
+            filetype = "";
+            if (l != "")
+            {
+                int lasts = l.LastIndexOf('\\');
+                location = l.Substring(0, lasts + 1);
+                int lastp = l.LastIndexOf('.');
+                int lastp2 = lastp - (lasts + 1);
+                filename = l.Substring(lasts + 1, lastp2);
+                filetype = l.Substring(lastp);
+            }
+
+            if (b != null)
+            {
+                b.Dispatcher.Invoke(() =>
+                {
+                    b.Content = l;
+                });
+            }
+        }
+
+        public void setImage(Bitmap i)
+        {
+            this.i = i;
         }
     }
 }
