@@ -24,14 +24,12 @@ namespace PictoCrypt
     {
         String Keyphrase = "";
         Crypter c;
-        //public Bitmap i;
-        //public String location;
-        //public String filename;
-        //public String filetype;
         public MainWindow()
         {
             InitializeComponent();
             c = new Crypter(Keyphrase);
+            Cover.Visibility = Visibility.Hidden;
+            EnOrDe.Visibility = Visibility.Hidden;
         }
 
         private void SelectPhoto_Click(object sender, RoutedEventArgs e)
@@ -89,12 +87,12 @@ namespace PictoCrypt
 
         private void Encrypt_Click(object sender, RoutedEventArgs e)
         {
-            c.encrypt(Image, SelectPhoto);
+            c.encrypt(Image, SelectPhoto, Cover, EnOrDe);
         }
 
         private void Decrypt_Click(object sender, RoutedEventArgs e)
         {
-            c.decrypt(Image, SelectPhoto);
+            c.decrypt(Image, SelectPhoto, Cover, EnOrDe);
         }
     }
 }

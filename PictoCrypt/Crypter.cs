@@ -46,11 +46,12 @@ namespace PictoCrypt
             }
         }
 
-        public async void encrypt(System.Windows.Controls.Image view, Button bu)
+        public async void encrypt(System.Windows.Controls.Image view, Button bu, System.Windows.Shapes.Rectangle r, TextBlock bl)
         {   if(i != null && key != "")
             {
                 await Task.Run(() =>
                 {
+                    setInProgress(true, r, bl);
                     int[] bounds = getBounds(i);
                     Bitmap b;
                     int[] randx = randomize(bounds[0]);
@@ -63,16 +64,18 @@ namespace PictoCrypt
                     b.Save(@"" + loc);
                     setLocation(loc, bu);
                     setImage(b);
+                    setStopped(r, bl);
                 });
             }
         }
 
-        public async void decrypt(System.Windows.Controls.Image view, Button bu)
+        public async void decrypt(System.Windows.Controls.Image view, Button bu, System.Windows.Shapes.Rectangle r, TextBlock bl)
         {
             if (i != null && key != "")
             {
                 await Task.Run(() =>
                 {
+                    setInProgress(false, r, bl);
                     int[] bounds = getBounds(i);
                     Bitmap b;
                     int[] randx = randomize(bounds[0]);
@@ -85,6 +88,7 @@ namespace PictoCrypt
                     b.Save(@"" + loc);
                     setLocation(loc, bu);
                     setImage(b);
+                    setStopped(r, bl);
                 });
             }
         }
@@ -117,9 +121,9 @@ namespace PictoCrypt
         private Bitmap pushV(Bitmap a, int wid, int hei, System.Windows.Controls.Image view)
         {
             Bitmap b = new Bitmap(a);
-            for (int wloc = 0; wloc < wid; wloc++)
+            for (int hloc = 0; hloc < hei; hloc++)
             {
-                for(int hloc = 0; hloc < hei; hloc++)
+                for(int wloc = 0; wloc < wid; wloc++)
                 {
                     b.SetPixel(wloc, (hloc + (convKey[wloc % keyLen] * 40)) % hei, a.GetPixel(wloc,hloc));
                 }
@@ -144,9 +148,9 @@ namespace PictoCrypt
         private Bitmap pushH(Bitmap a, int wid, int hei, System.Windows.Controls.Image view)
         {
             Bitmap b = new Bitmap(a);
-            for (int hloc = 0; hloc < hei; hloc++)
+            for (int wloc = 0; wloc < wid; wloc++)
             {
-                for (int wloc = 0; wloc < wid; wloc++)
+                for (int hloc = 0; hloc < hei; hloc++)
                 {
                     b.SetPixel((wloc + (convKey[hloc%keyLen]*40))%wid, hloc, a.GetPixel(wloc, hloc));
                 }
@@ -158,9 +162,9 @@ namespace PictoCrypt
         {
             Bitmap b = new Bitmap(a);
             //fix negative problem better
-            for (int wloc = 0; wloc < wid; wloc++)
+            for (int hloc = 0; hloc < hei; hloc++)
             {
-                for (int hloc = 0; hloc < hei; hloc++)
+                for (int wloc = 0; wloc < wid; wloc++)
                 {
                     b.SetPixel(((wloc - (convKey[hloc % keyLen]*40))+(wid*40)) % wid, hloc, a.GetPixel(wloc, hloc));
                 }
@@ -289,9 +293,9 @@ namespace PictoCrypt
         private Bitmap randomEnH(Bitmap i, int wid, int hei, int[] key, System.Windows.Controls.Image view)
         {
             Bitmap b = new Bitmap(i);
-            for (int wloc = 0; wloc < wid; wloc++)
+            for (int hloc = 0; hloc < hei; hloc++)
             {
-                for (int hloc = 0; hloc < hei; hloc++)
+                for (int wloc = 0; wloc < wid; wloc++)
                 {
                     b.SetPixel(wloc, key[hloc], i.GetPixel(wloc, hloc));
                 }
@@ -304,9 +308,9 @@ namespace PictoCrypt
         private Bitmap randomEnW(Bitmap i, int wid, int hei, int[] key, System.Windows.Controls.Image view)
         {
             Bitmap b = new Bitmap(i);
-            for (int hloc = 0; hloc < hei; hloc++) 
+            for (int wloc = 0; wloc < wid; wloc++) 
             {
-                for (int wloc = 0; wloc < wid; wloc++)
+                for (int hloc = 0; hloc < hei; hloc++)
                 {
                     b.SetPixel(key[wloc], hloc, i.GetPixel(wloc, hloc));
                 }
@@ -398,6 +402,40 @@ namespace PictoCrypt
         public void setImage(Bitmap i)
         {
             this.i = i;
+        }
+
+        public void setInProgress(Boolean en, System.Windows.Shapes.Rectangle r, TextBlock bl)
+        {
+            bl.Dispatcher.Invoke(() =>
+            {
+                if (en)
+                {
+                    bl.Text = "Encrypting";
+                }
+                else
+                {
+                    bl.Text = "Decrypting";
+                }
+                bl.Visibility = System.Windows.Visibility.Visible;
+            });
+
+            r.Dispatcher.Invoke(() =>
+            {
+                r.Visibility = System.Windows.Visibility.Visible;
+            });
+        }
+
+        public void setStopped(System.Windows.Shapes.Rectangle r, TextBlock bl)
+        {
+            bl.Dispatcher.Invoke(() =>
+            {
+                bl.Visibility = System.Windows.Visibility.Hidden;
+            });
+
+            r.Dispatcher.Invoke(() =>
+            {
+                r.Visibility = System.Windows.Visibility.Hidden;
+            });
         }
     }
 }
