@@ -59,8 +59,8 @@ namespace PictoCrypt
             int[] randy = randomize(bounds[1]);
             b = unPushH(i, bounds[0], bounds[1]);
             b = unPushV(b, bounds[0], bounds[1]);
-            b = randomDeH(b, bounds[0], bounds[1], randx);
-            b = randomDeW(b, bounds[0], bounds[1], randy);
+            b = randomDeH(b, bounds[0], bounds[1], randy);
+            b = randomDeW(b, bounds[0], bounds[1], randx);
             b.Save(@"" + saveLocation + name + "-decrypted" + type);
             return null;
         }
