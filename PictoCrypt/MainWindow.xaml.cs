@@ -43,6 +43,7 @@ namespace PictoCrypt
                 ((Button)sender).Content = tempfile;
                 c.setImage(new Bitmap(tempfile));
                 Image.Source = new BitmapImage(new Uri(@"" + tempfile));
+                Image.Visibility = Visibility.Visible;
                 c.setLocation(tempfile, null);
             }
             catch

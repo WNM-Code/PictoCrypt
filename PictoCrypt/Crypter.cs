@@ -135,9 +135,9 @@ namespace PictoCrypt
         {
             Bitmap b = new Bitmap(a);
             //fix negative problem better
-            for (int wloc = 0; wloc < wid; wloc++)
+            for (int hloc = 0; hloc < hei; hloc++)
             {
-                for (int hloc = 0; hloc < hei; hloc++)
+                for (int wloc = 0; wloc < wid; wloc++)
                 {
                     b.SetPixel(wloc, ((hloc - (convKey[wloc % keyLen]*40))+(hei*40)) % hei, a.GetPixel(wloc, hloc));
                 }
@@ -162,9 +162,9 @@ namespace PictoCrypt
         {
             Bitmap b = new Bitmap(a);
             //fix negative problem better
-            for (int hloc = 0; hloc < hei; hloc++)
+            for (int wloc = 0; wloc < wid; wloc++)
             {
-                for (int wloc = 0; wloc < wid; wloc++)
+                for (int hloc = 0; hloc < hei; hloc++)
                 {
                     b.SetPixel(((wloc - (convKey[hloc % keyLen]*40))+(wid*40)) % wid, hloc, a.GetPixel(wloc, hloc));
                 }
@@ -327,7 +327,7 @@ namespace PictoCrypt
             {
                 for (int wloc = 0; wloc < wid; wloc++)
                 {
-                    b.SetPixel(wloc, hloc, i.GetPixel(wloc, key[hloc]));
+                    b.SetPixel(wloc, key[hloc], i.GetPixel(wloc, key[key[hloc]]));
                 }
                 updateImage(b, view);
             }
@@ -338,11 +338,11 @@ namespace PictoCrypt
         private Bitmap randomDeW(Bitmap i, int wid, int hei, int[] key, System.Windows.Controls.Image view)
         {
             Bitmap b = new Bitmap(i);
-            for (int hloc = 0; hloc < hei; hloc++)
+            for (int wloc = 0; wloc < wid; wloc++)
             {
-                for (int wloc = 0; wloc < wid; wloc++)
+                for (int hloc = 0; hloc < hei; hloc++)
                 {
-                    b.SetPixel(wloc, hloc, i.GetPixel(key[wloc], hloc));
+                    b.SetPixel(key[wloc], hloc, i.GetPixel(key[key[wloc]], hloc));
                 }
                 updateImage(b, view);
             }
